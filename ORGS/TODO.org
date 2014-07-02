@@ -1,0 +1,232 @@
+T H I S    I S    A    T O - D O    L I S T
+KEEP TRACK OF HOURS!!
+
+Friday BGSA workshop
+
+* No load fee (cut before the door)
+
+* Consumer reports
+
+* Kiplinger
+
+
+
+
+
+* General To-do
+
+** Assembly related
+
+*** TODO Finish trinity script, with alignment (See below)
+*** VERIFY Get singletons
+*** TODO Cat CDS and trinity gtfs and sort them
+**** Make part of the pipeline
+*** TODO Add Ruby script to quantify the number of reads per transcript, eliminating those with low read counts (< 10)
+**** Modify the GTFs to make the transcript's parent the 4 genes
+**** Modify the GTF to make the CDS parent the transcript, and the CDS derives from gene
+**** See: [[http://www.sequenceontology.org/gff3.shtml][Documentation]]
+*** TODO Check Trinity annotation in IGV
+*** TODO Create summary R script
+**** Number of transcripts, singletons, fraction of reads assembled
+**** Number of operons, number of CDS/ORF per operon
+**** Distribution of transcript size
+****
+*** [Optional] Reannotate the assembly?
+**** Trinotate, others?
+
+*** Quality metrics?
+**** Ruby Gem: [[https://github.com/Blahah/transrate][transrate]]
+**** Need to insall Usearch, eXpress
+**** Full length transcript analysis Blast+ [[http://trinityrnaseq.sourceforge.net/analysis/full_length_transcript_analysis.html][trinity]]
+**** Number of transcripts that map back to genome, distribution of mapping/alignment statistics
+**** Presence of any disagreements between the assembly and the genomes (e.g. variation)
+** Coverage related
+*** TODO Graph Coverage of first ~100 bp
+*** Visualize as 3D plot of density(z) vs position (x) vs coverage (y)
+** cis-software
+*** Read Cufflinks GTF file in, create reverse-GTF
+*** Set difference of BAM - reverse GTF (filters entries not on opposite strand)
+*** Save as is?
+*** Pipe to set difference of filtered BAM - CDS? Forward Cufflinks GTF?
+*** Pipe to Cufflinks assembly
+*** !!!! IDEA !!!!
+**** Create a distribution of coverage (likely lognormal) for sense transcription
+**** Defined as transcripts with lengths greater than X and with genes mapping back on to them
+**** Then use a statistical hypothesis test to filter reads/transcripts with short length and low coverage.
+**** i.e. filter the transcript if the majority of its coverage is less than the threshold for sense transcription.
+**** (p < 0.05)
+
+** Metrics
+*** Number of TSS/CisRNA
+*** Distributions of reads/cisRNA
+*** Distribution of reads along TSS (same as first item of todo list)
+*** Size distribution of cisRNA / UTR region
+*** Number of cisRNA that overlap RBS, start codon
+*** Comparison of operon organization of Paredes.
+
+** TODO Reach out to Pam, Blake, Cathy, Shawn
+*** Hello _____
+*** I am wrapping up the first stage of my thesis research under Dr. Papoutsakis and I am looking
+*** to form my thesis committee. Given your background in (RNA, small RNA and NGS, NGS and bioinformatics)
+*** I believe that you might be interested in my project. I would love to tell you briefly about my research.
+*** Thank you for your time.
+
+
+** NOTE: For TSS annotation, use both non-unique and unique reads to detect TSS
+** Cuffdiff contains differential promoter usage information
+** TODO Galaxy
+*** TODO Go through a worked example
+*** TODO Upload data through ftp/filezilla
+*** TODO Document the steps required
+*** Talk with Shawn about setting up a local Galaxy install
+**** Step 1: Install- Karol
+**** Step 2: Linking tools: Matt and Karol
+**** Step 3: Configuring user accounts/account requests- Karol
+**** Step 4: Configuring data libraries/datasets: Shawn/Karol/Matt
+**** Step 5: Testing that users can run jobs locally on server node
+**** Step 6: Configuring Galaxy with Torque (Watch out for [[http://goo.gl/acKZ4x][Torque]]!) Resource management DRMAA
+**** Step 7: [[https://wiki.galaxyproject.org/Admin/Config/Performance/Cluster#Submitting_Jobs_as_the_Real_User][Submitting links as the real user]]
+**** 
+
+
+
+
+
+
+
+
+* Computational
+** Data exploration
+*** Library complexity
+**** Fraction of unique single reads of all mapped reads
+**** Fraction of unique pairs of all mapped pairs
+*** Coverage plot
+**** Coverage vs gene (%, 5'->3') (Express coverage over each gene, where gene length is expressed as percent)
+*** 
+*** 
+*** Correlations between replicates (FPKM)
+**** Pearson
+**** Spearman
+*** Coorelation plot
+**** Expression condition A vs expression condition B
+**** E.G. x vs. y, y vs. z, x vs. z
+**** Log transformed (shows more variation)
+**** What are the genes that deviate? How do we find them?
+***** Perform regression, calculate the residuals for each gene, sort the list by residuals
+*** Strandedness plots
+*** [[http://smithlab.usc.edu/plone/software/librarycomplexity][PRESEQ!!!]]
+**** Preseq is a library that randomly samples reads from a sequence alignment and uses this to calculate the
+**** redundancy of smaller libraries.
+
+** Further exploration
+*** ADDRESS OVERPLOTTING BY [[http://gettinggeneticsdone.blogspot.com/2012/07/fix-overplotting-with-colored-contour.html][Colour contour plot (CLICK ME!)]]
+*** Circos
+**** Histogram
+**** Scatterplot
+**** Line graph
+**** Heatmap
+**** Average read count
+**** Stack circos png into 3D
+***** Sliceomatic (Matlab)
+**** Create gif from circos pngs
+***** Hist/Line/Scatter
+***** Heatmap
+*** Volcano plots (MA plot: log2 fold change vs log normalized counts) w/ highlighting significant genes
+*** Significance plot (-log10(p-value/FDR) vs log2(fold change)
+*** Variation plot: variance (transformed?) vs log normalize counts
+** Differential expression
+*** Cuffdiff/cuffnorm
+*** DEseq
+*** MLseq
+** Visualize in circos
+
+
+* NGS tutorial workshop
+** PhiX reads
+** Ask students to create a galaxy account and load the phiX genome into their data
+
+
+* Social
+** Events
+** BiSA
+** Personal
+*** Valentine's Day
+**** Set experiments
+**** Get gift
+**** Practice ingredients
+*** Allison's 40th
+**** Find out reservation policy
+**** Find out about classes?
+
+
+
+
+* THESIS
+** Transcription start site
+** New sRNAs
+** Clustering by expression pattern(old data)
+** Use clusters and TSS info to predict promoter motifs
+*** Check if motifs are similar to known.
+*** Split clusters into training and test data
+*** Use the training data to build a motif
+*** Test the motif against the test dataset
+*** If the motifs match well, arrive at consensus sequence
+
+** Validate by multiplex 5' RACE?
+
+* Process old data
+** Do process for one dataset
+*** Quality contorl script BASH
+*** Trimming/clipping/filtering/qc script BASH + RUBY
+**** Create parsing script to flags files/datasets with poor statistics? From which output?
+**** Use flag as input for next round of Trimming/clipping/filtering/qc
+*** Mapping BASH
+*** Post-mapping quality
+** Repeat using recursion for files in a directory
+*** Retool scripts for handling these data
+
+* COURSERA
+** TODO Read the 'How to Design Programs' Felleisen et al.
+
+* Schools/Areas
+Massachussetts
+Pennsylvania
+North Carolina
+New York
+Virginia
+Maryland
+Michigan
+South Carolina
+Alabama
+Georgia
+Florida
+Arizona
+Connecticut
+Ohio
+Illinois
+
+
+
+* Textbooks
+** TODO Biological Modeling and Simulation
+** TODO General Statistics
+** TODO Thermodynamics
+** TODO Understanding Bioinformatics
+** TODO Systems Bio Voit + Alon
+** TODO Linear Algebra / Differential Equations
+** TODO Statistics D.O.E.
+** TODO Partial Diff Eq.
+** TODO Mathematical Biology
+* Professional Development
+** TODO Claude Shannon - Mathematical Theory of Communication
+* Fields to Study
+** TODO Thermodynamics
+** TODO Mathematics
+** TODO Statistics
+** TODO Economics
+** TODO Communication
+** TODO Teamwork / Management
+** TODO Physics
+** TODO Entrepeneurship - Startup Owners Manual - Lean start-up udacity.com
+
+
