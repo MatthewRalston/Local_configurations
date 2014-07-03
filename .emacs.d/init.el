@@ -12,3 +12,4 @@
 ;;(load "autocomplete.el")
 (load "TeX-config.el")
 (load "http-config.el")
+(load "flyspell-config.el")
