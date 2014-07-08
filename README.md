@@ -1,5 +1,5 @@
 # README
-
+Copyright 2014
 This folder contains my local bash and emacs configuration. Currently installed emacs modules can be found in Modules.md
 
 ##Special configurations
