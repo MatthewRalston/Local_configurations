@@ -13,7 +13,10 @@ Friday BGSA workshop
 
 
 
-* General To-do
+* TODO General To-do
+  CLOCK: [2014-07-08 Tue 10:25]
+
+
 
 ** Assembly related
 

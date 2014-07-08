@@ -61,6 +61,28 @@ Toggle Flyspell mode
 C-Shift F10
 ```
 
+* Emacs Org-mode task timer
+
+Clock in
+```
+C-c C-x C-i
+```
+
+Clock out
+```
+C-c C-x C-o
+```
+
+Timing report
+```
+C-c C-x C-r
+```
+
+Update report
+```
+C-c C-c
+```
+
 ##Future work
 In the future, I will be adding additional configurations for LaTeX.
 
