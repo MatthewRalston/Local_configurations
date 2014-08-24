@@ -14,26 +14,393 @@ Friday BGSA workshop
 
 
 * TODO General To-do
-  CLOCK: [2014-07-08 Tue 10:25]
+
+** TODO Summary
+*** Summary stats
+*** Alignment stats
+*** Differential expression
+** TODO Circos
+*** Coverage vectors
+*** Log2 fold changes
+*** Relationships
+
+
+** Visualize with circos
+
+*** scripts:
+**** log2(expression ratio)
+***** for each gene
+***** chr gene_start gene_end value time=comparison (15, 75, 150, 270)
+**** modified coverage_calc.rb
+***** Make sampling area a parameter
 
 
 
-** Assembly related
+*** Automation
+**** [[http://circos.ca/documentation/tutorials/recipes/automating_tracks/][Tutorial]]
+**** A general procedure for track generating automation (simplifies the code)
+**** circos.conf
+heatmap_width = 0.005
+heatmap_step = 0.01
+time_heatmap_start = 0.9 (or whatever)
+stress_heatmap_start = 0.5 (or whatever
+histogram_start = 0.8 (or whatever)
+# histogram_step is proportional to the size that the histograms will occupy in the diagram
+# (e.g. 48 histograms * 0.01 = 0.48 or 48% of the radius)
+# (e.g. or 24 histograms * 0.02 = 0.48 but have higher resolution
+histogram_step = 0.01 (RUH-ROH: histogram_step * number of tracks = amount of space occupied by histograms
+# histogram_step = 0.02
+
+# The divisor is the number of elements in a stress level = replicates (2 | 1) * time points (4) * strands (2)
+hist_divisor = 16 (2 * 4 * 2)
+# The modulus is the number of elements in a group = replicates * strands (2))
+hist_modulus = 4 (2 * 2)
+<plots>
+
+
+
+<<include stress_heatmap.conf>>
+
+type = histogram
+extend_bin = yes
+min = 0
+max = 1 (or whatever)
+init_counter = time_heat_count:0
+init_counter = histogram_count:0
+init_counter = stress_heat_count:0
+<<include histogram.conf>>
+.
+.
+.
+<<include histogram.conf>> (n times to produce n histogram tracks
+
+<<include time_heatmap.conf>>
+
+</plots>
+**** stress_heatmap.conf
+type = heatmap
+min = -2
+max = -2 (or whatever)
+<<include butanol_heatmap.conf>>
+<<include t1_rule.conf>>
+<<include butanol_heatmap.conf>>
+<<include t2_rule.conf>>
+<<include butanol_heatmap.conf>>
+<<include t3_rule.conf>>
+<<include butanol_heatmap.conf>>
+<<include t4_rule.conf>>
+
+<<include butyrate_heatmap.conf>>
+<<include t1_rule.conf>>
+<<include butyrate_heatmap.conf>>
+<<include t2_rule.conf>>
+<<include butyrate_heatmap.conf>>
+<<include t3_rule.conf>>
+<<include butyrate_heatmap.conf>>
+<<include t4_rule.conf>>
+
+**** butanol_heatmap.conf
+<plot>
+post_increment_counter = 1
+init_counter = thickness:0
+thickness = eval(max(1,8-int(counter(thickness))))
+post_increment_counter = thickness:0.5
+
+file = circos/data/heatmap_butanol.txt
+r0 = eval(sprintf("%fr",conf(stress_heatmap_start)-counter(stress_heatmap_count)*conf(heatmap_step)))
+r1 = eval(sprintf("%fr",conf(stress_heatmap_start)+conf(heatmap_width)-counter(stress_heatmap_count)*conf(heatmap_step)))
+color = piyg-7-div
+
+**** butyrate_heatmap.conf
+<plot>
+post_increment_counter = 1
+init_counter = thickness:0
+thickness = eval(max(1,8-int(counter(thickness))))
+post_increment_counter = thickness:0.5
+
+file = circos/data/heatmap_butyrate.txt
+r0 = eval(sprintf("%fr",conf(stress_heatmap_start)-counter(plot)*conf(heatmap_step)))
+r1 = eval(sprintf("%fr",conf(stress_heatmap_start)+conf(heatmap_width)-counter(plot)*conf(heatmap_step)))
+color = piyg-7-div
+
+
+
+***** Second heatmap is of butyrate
+<plot>
+file = circos/data/heatmap_butyrate.txt
+r0 = eval(sprintf("%fr",conf(track_start)-counter(plot)*conf(track_stop)))
+r1 = eval(sprintf("%fr",conf(track_start)+conf(track_width)-counter(plot)*conf(track_step)))
+orientation = ?? (sequential time points going out)
+color = brbg-7-div
+</plot>
+
+**** coverage.conf
+<<include histogram.conf>>
+.
+.
+.
+<<include histogram.conf>>
+**** histogram.conf
+<plot>
+post_increment_counter = 1
+init_counter = thickness:0
+thickness = eval(max(1,8-int(counter(thickness))))
+post_increment_counter = thickness:0.5
+
+<<include histfile.conf>>
+<<include hist_radius.conf>>
+<<include hist_color.conf>>
+<<include hist_rules.conf>>
+<<include hist_backround.conf>>
+</plot>
+**** histfile.conf
+file = circos/data/histogram_cov_counter(histogram_count).txt
+**** hist_radius.conf
+r0 = eval(sprintf("%fr",conf(histogram_start)-counter(histogram_count)*conf(histogram_step)))
+r1 = eval(sprintf("%fr",conf(histogram_start)+conf(histogram_width)-counter(histogram_count)*conf(histogram_step)))
+# first track is out, plus strand
+orientation = eval( counter(histogram_count) % 2 ? "out" : "in" )
+**** hist_color.conf
+***** Tricky so far only formulaic for the main 48 samples (not TEX)
+***** sequential tracks (e.g. strands; tracks 1 and 2) have same color
+***** sequential pairs of tracks (e.g. replicates; tracks 1,2 3,4) have same color
+***** sequential groups of pairs (e.g. time points in same stress level) have slightly different colors
+***** Different stress levels (NS vs BuOH) have different colors
+# whichever colors: reds, blues, greens, yellows, purples, oranges
+***** hist_divisor = number of elements in a stress level (8,16)- selects for stress from list divisor for the number 
+***** hist_moduluso = 4 number of elements in a group with the same exact color- selects for time point 
+fill_color = eval(join('',(qw(reds_7_seq_ greens_7_seq_ blues_7_seq_))[counter(histogram_count) / hist_divisor],(counter(histogram_count)%hist_modulus + 1)))
+**** hist_rules.conf
+**** hist_background.conf
+<backgrounds>
+<background>
+# pattern get darker and darker with NS grey in the middle
+color = eval((qw(vvvlgrey vvlgrey vlgrey lgrey grey grey grey grey dgrey vdgrey vvdgrey vvvdgrey))[counter(histogram_count) / 4]
+</background>
+</backgrounds>
+
+**** time.conf
+type = heatmap
+min = -2
+max = 2 (or whatever)
+<<include time_heatmap.conf>>
+<<include t1_rule.conf>>
+<<include time_heatmap.conf>>
+<<include t2_rule.conf>>
+<<include time_heatmap.conf>>
+<<include t3_rule.conf>>
+<<include time_heatmap.conf>>
+<<include t4_rule.conf>>
+
+
+**** time_heatmap.conf
+<plot>
+file = circos/data/heatmap_time.txt
+r0 = eval(sprintf("%fr",conf(time_heatmap_start)-counter(time_heat_count)*conf(heatmap_step)))
+r1 = eval(sprintf("%fr",conf(time_heatmap_start)+conf(heatmap_width)-counter(time_heat_count)*conf(heatmap_step)))
+color = rdylbu-7-div
+
+**** t1_rule.conf
+<rules>
+<rule>
+condition = var(time) ne 15
+show = no
+</rule>
+</rules>
+</plot>
+**** t2_rule.conf
+<rules>
+<rule>
+condition = var(time) ne 75
+show = no
+</rule>
+</rules>
+</plot>
+
+**** t3_rule.conf
+<rules>
+<rule>
+condition = var(time) ne 150
+show = no
+</rule>
+</rules>
+</plot>
+
+**** t4_rule.conf
+<rules>
+<rule>
+condition = var(time) ne 270
+show = no
+</rule>
+</rules>
+</plot>
+
+*** Ring 1-Outside: Genes (as before)
+*** Ring 2-Next inside: Gene ID [[http://circos.ca/documentation/tutorials/quick_start/text/images][Text labels]]
+*** Ring 3-Next inside: Gene density (optional)
+*** Ring 4-Next inside: 8 heatmaps for differential expression (heatmaps)
+**** File: circos/data/heatmap_0.txt
+**** Values
+***** Values are log2(expression-ratio) of the comparison
+**** Coloring
+Coloring is simply 
+**** Orientation
+
+**** TODO Configuration for circos.conf:
+<plot>
+type    = heatmap
+file    = circos/heatmapdata.txt
+# color list
+color   = piyg-9-div
+r1      = 0.95r
+r0      = 0.80r
+</plot>
+
+**** Heatmap tutorials: [[http://circos.ca/documentation/tutorials/2d_tracks/heat_maps/][Advanced]]  [[http://circos.ca/documentation/tutorials/quick_start/heatmaps_and_colors/][Quick n dirty]] [[http://circos.ca/documentation/tutorials/recipes/automating_heatmaps/configuration][Automating heatmaps]] [[http://circos.ca/documentation/tutorials/recipes/automating_tracks/][General automation]]
+**** TODO use ruby script to create log2 expression ratios: log2(gene-a-t1 / gene-a-t2 )
+**** TODO Create legend in illustrator: use palette definition in circos/etc/colors.brewer.conf
+*** Ring 5-Next inside: 12, 24, or 30 Coverage vectors (as before, but smaller)
+**** Each coverage vector has two sides +/- : 24, 48, or 60 tracks
+**** [[http://circos.ca/documentation/tutorials/recipes/automating_tracks/][Automating]]
+**** File: circos/data/histogram_cov_0.txt
+**** Values
+***** Values are log10(avg_coverage_per_base):
+***** Should be sampled from large intervals at first (kb) then smaller (100bp)
+
+**** Coloring
+***** Both strands are same solor
+***** Replicates from same factorial combination are same color
+***** Time points from same stress are slightly different color
+***** Stress levels are different colors
+**** Orientation
+***** Strands have opposite orientations
+
+**** TODO Illustrator color legend: color scale vs saturation scale
+
+*** Ring 6-Next inside: time course heatmap of normal gene expression (optional)
+*** Ring 7-Inside: Coexpression clustering relationships (links w/ rules from coclustering)
+**** TODO Color links by coexpression pattern
+**** Cluster genes by expression profile w/ respect to time :
+In a nxm matrix (n genes by m time points)
+Gene_id  t1  t2  t3  t4
+Gene_1  a  b  c  d
+Gene_2  e  f  g  h
+Gene_3  etc.
+.       .  .  .  .
+.       .  .  .  .
+.       .  .  .  .
+Gene_n  w  x  y  z
+Cluter genes by expression profile vector (e.g. Gene_1 : [a,b,c,d])
+**** Cluster genes by Stress responsive vector? Separately by stress
+An nxm matrix (n genes by m time-stress combinations)
+Gene_id  c1t1  c1t2  c1t3  c1t4  c2t1  c2t2  c2t3  c2t4
+Gene_1  a  b  c  d  e  f  g  h
+.       .  .  .  .  .  .  .  .
+.       .  .  .  .  .  .  .  .
+.       .  .  .  .  .  .  .  .
+Gene_n  s  t  u  v  w  x  y  z
+
+
+
+Gene_id  c1t1  c1t2  c1t3  c1t4  c3t1  c3t2  c3t3  c3t4
+Gene_1  a  b  c  d  e  f  g  h
+.       .  .  .  .  .  .  .  .
+.       .  .  .  .  .  .  .  .
+.       .  .  .  .  .  .  .  .
+Gene_n  s  t  u  v  w  x  y  z
+
+*** Image map
+
+** Visualization with d3
+
+*** D3 with circos??
+
+**** Circos end:
+***** ANY 2d track can be given a unique identifier by adding
+***** chr start end value svgid=blah_blah_blah
+***** This blahblahblah can be accessed by d3
+***** CONNECT THIS TO FUNCTION (hyperlinking, displaying value)
+**** Importing svg into d3 context [[http://christopheviau.com/d3_tutorial/d3_inkscape/][Tutorial]]
+***** Inside body, create special div for svg: <div id="viz"></div>
+***** inside <script type="text/javascript">
+***** Use d3.xml to load svg
+***** Add D3 functionality inside d3.xml tag (display data, provide hyperlinks)
+
+
+
+
+*** Differential expression !!!!
+**** Scatterplot
+***** [[http://www.nytimes.com/interactive/2012/05/17/business/dealbook/how-the-facebook-offering-compares.html?_r=0][Scatterplot with labels]]
+***** View the gene name, differential expression condition, pvalue others
+**** Linkages: GO term with genes
+***** [[http://www.findtheconversation.com/concept-map][concept map]]
+***** x DE genes in the center
+***** linked to GO terms on the outside
+***** Each gene is linked to a condition/time combination? show expression level, percentage changes?
+***** Allows more detailed exploration of the gene
+***** Each gene ontology is linked to a graph which describes the enrichment of the gene ontology term in certain conditions
+
+**** Interactive heatmap
+***** [[http://bl.ocks.org/ianyfchang/8119685][Interactive heatmap]]
+***** Ordering by cluster??
+***** Display fold change?
+*** Coexpression clustering with d3
+**** Circular clustering and interaction
+***** Demo code: [[https://mbostock.github.io/d3/talk/20111116/bundle.html][Plain html: view source]]
+***** BETTER SOURCE: https://gist.github.com/mbostock/1044242
+***** Each record of json database has 'imports' a dictionary of linkages
+***** Each import becomes colored red when hovering over a particular gene.
+***** But, Each record that imports that gene is colored in green
+***** USE Projects/d3/hierarchical_edge_bundling_interactive/bundle.html
+***** Load data into json database
+**** Circular clustering with magnitude
+***** May be useful for genes or for gene ontology terms
+***** [[http://bost.ocks.org/mike/uberdata/][Circular plot]]
+**** Hive plot clusterin and interaction
+***** May be harder to use... [[http://bost.ocks.org/mike/hive/][hive plot]]
+**** Heatmap: clustering, [correlation magnitude, p-value?] - gene vs GO term
+*** Gene ontology visualizations
+**** Node link tree: [[http://bl.ocks.org/mbostock/4063550][Reingold-Tilford algorithm]]
+**** Circular interaction with magnitudes [[http://bost.ocks.org/mike/uberdata/][Circular interaction]]
+**** DITTO: [[http://redotheweb.com/DependencyWheel/][Dependency wheel]]
+**** Genes vs gene ontology terms - co-occurence matrix: [[http://bost.ocks.org/mike/miserables/][Les Mis co-occurrence]]
+**** 
+*** Correlation matrices
+**** [[https://mbostock.github.io/d3/talk/20111116/iris-splom.html][interactive subsetting]]
+**** For differential expression viewing
+**** Another version (older): [[http://benjiec.github.io/scatter-matrix/demo/demo.html][older]]
+*** Sankey (non-circular) Flow diagrams with magnitude
+**** May be useful for visualizing the change in gene ontology over time...
+**** [[http://bost.ocks.org/mike/sankey/][Sankey diagrams]]
+**** Can this be modified to display the number associated with the magnitude?
+**** As alluvial diagram
+*** Sunburst Flow diagrams with percentages
+**** Very exhaustive... may visualize something interesting. or not.
+**** [[http://bl.ocks.org/kerryrodden/7090426][Sequence sunburst]]
+*** Slider subsetter with histograms
+**** [[http://square.github.io/crossfilter/][Crossfilter]]
+*** Genomic viewer for coverage
+**** [[http://square.github.io/crossfilter/][Cubism]]
+*** As an illustration to show a eulerian path e.g. trinity assembly
+**** [[http://goo.gl/8Y9nSH][Hamiltonian path]]
+
+** Transrate
+*** TODO Produce optional coverage file
+*** TODO Produce optional tss-coverage file
+*** TODO Number of reads per transcript
+** Adjust bowtie2 script
+*** Alternate filtering strategy
+*** Filter by location (bed?)
 
 *** TODO Finish trinity script, with alignment (See below)
-*** VERIFY Get singletons
 *** TODO Cat CDS and trinity gtfs and sort them
 **** Make part of the pipeline
-*** TODO Add Ruby script to quantify the number of reads per transcript, eliminating those with low read counts (< 10)
-**** Modify the GTFs to make the transcript's parent the 4 genes
-**** Modify the GTF to make the CDS parent the transcript, and the CDS derives from gene
 **** See: [[http://www.sequenceontology.org/gff3.shtml][Documentation]]
 *** TODO Check Trinity annotation in IGV
 *** TODO Create summary R script
-**** Number of transcripts, singletons, fraction of reads assembled
 **** Number of operons, number of CDS/ORF per operon
-**** Distribution of transcript size
-****
+**** Distribution of transcript sizex
 *** [Optional] Reannotate the assembly?
 **** Trinotate, others?
 
@@ -43,9 +410,6 @@ Friday BGSA workshop
 **** Full length transcript analysis Blast+ [[http://trinityrnaseq.sourceforge.net/analysis/full_length_transcript_analysis.html][trinity]]
 **** Number of transcripts that map back to genome, distribution of mapping/alignment statistics
 **** Presence of any disagreements between the assembly and the genomes (e.g. variation)
-** Coverage related
-*** TODO Graph Coverage of first ~100 bp
-*** Visualize as 3D plot of density(z) vs position (x) vs coverage (y)
 ** cis-software
 *** Read Cufflinks GTF file in, create reverse-GTF
 *** Set difference of BAM - reverse GTF (filters entries not on opposite strand)
