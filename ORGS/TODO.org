@@ -19,6 +19,87 @@ Friday BGSA workshop
 *** Summary stats
 *** Alignment stats
 *** Differential expression
+**** Correlation
+**** MA-plots
+**** Dispersion plots
+**** PCA
+*** Gene expression clustering
+**** Preprocessing
+***** Data normalization [[http://manuals.bioinformatics.ucr.edu/home/R_BioCondManual#TOC-Clustering-and-Data-Mining-in-R][Scaling]] (DE normalization??)
+***** Regularization? (a la DEseq?
+**** Feature selection
+***** Differential genes only
+**** Distance metric
+***** Distance matrix selection (e.g. Minkowski measures: Euclidean, Manhattan, Chebyshev OR Mahalanobis**)
+****** Useful when searching for EXACT matches between profiles
+***** Correlation matrix ***
+***** Conditional entropy
+**** Linkage
+***** Single (nearest)
+***** Complete (farthest)
+***** Average
+***** Centroid (distance between centroid of each cluster)
+***** Ward (minimizes ANOVA SSE between the clusters)
+**** THEN: CLUSTER [[http://cran.at.r-project.org/web/views/Cluster.html][R portal to clustering]]
+**** Considerations
+***** Partical or complete clustering? (Do all genes need a cluster?)
+**** Techniques
+***** Hierarchical clustering (agglomerative)
+****** Assumptions:
+******* None, well that the criterion for calculating (a)similarity is appropriate
+****** Options:
+******* Connectivity constraints
+****** Pros:
+******* Easy to implement
+******* Informative
+****** Cons:
+******* Debate over utility: pergormance is close to random
+***** K-means (Partitive; iterative)
+****** Assumptions:
+******* Clusters are convex
+****** K-medians
+****** K-medoids (PAM)
+****** Spectral clustering
+****** Tight clustering (random resampling)
+******* Noise tolerant
+****** MGKM (higher cost, slight improvement)
+****** IGKA (incremental genetic K-means algo.; combines genetic algorithm and K-means)
+******* Uses 'Total within cluster variance' as fitness function
+******* Incrementally clusters centroids
+******* Sensitive to by GA parameters (mutation rate, generation, etc.)
+***** Density based clustering
+****** Pros/cons
+******* Pros
+******** No assumptions on convexity
+******* Cons
+******** Non-deterministic
+****** EnDBSCAN/OPTICS
+****** Mean-shift (uses KDE)
+***** Self organizing maps (Neural nets)
+****** SOTA
+****** DGSOT
+****** GHTSOM
+******* Very unique training criteria
+******* New nodes are trained only using input which caused the parent node to fire
+******* Inputs mapping to leaf neurons at the top of the hierarchy are usually noise!!
+***** Biclustering
+****** FLOC (George Church??)
+****** Possibilistic biclustering
+******* H score
+***** Fuzzy clustering
+****** Fuzzy C-means/ FLAME
+******* Differ by weighting; A gene's FCM membership score is proportional to similarity to cluster mean)
+******* FLAME determined by weighted similary to K-nearest neighbors and their membership score to cluster
+
+***** Search based
+****** Simulated annealing
+****** FLOC
+****** Expectation maximization
+***** Graph theoretic
+****** CAST
+**** Evaluation
+***** pvclust: an R library for assessing hierarchical clustering
+***** Adjusted rand metric (meh)
 ** TODO Circos
 *** Coverage vectors
 *** Log2 fold changes
