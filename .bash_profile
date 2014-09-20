@@ -7,7 +7,7 @@ export PATH=/usr/local/bin/:$PATH
 
 
 # MacPorts Installer addition on 2013-04-01_at_23:07:38: adding an appropriate PATH variable for use with MacPorts.
-export PATH=/opt/local/bin:/opt/local/sbin:/Users/Matthew/Documents/Bash_scripts:/Applications/circos-0.64/bin/:$PATH
+export PATH=/opt/local/bin:/opt/local/sbin:/Users/Matthew/Documents/Bash_scripts:/Applications/circos-0.66/bin/:$PATH
 # Finished adapting your PATH environment variable for use with MacPorts.
 
 export PERL5LIB="$HOME/SourceCache/bioperl-live:$PERL5LIB"
@@ -40,7 +40,7 @@ alias l='ls -CFlh'
 # Sorts files by size
 alias sortbysize="ls -s | sort -n"
 
-PATH=$PATH:/Application/Unix_modules/bedtools2-2.19.1/bin/
+PATH=$PATH:/Application/Unix_modules/bedtools2-2.19.1/bin/:/Users/Matthew/pckges/yuicompressor-2.4.8.jar
 export PATH
 export PS1="\w >"
 
