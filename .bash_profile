@@ -51,3 +51,4 @@ export RSENSE_HOME
 
 # added by Anaconda 1.8.0 installer
 #export PATH="//anaconda/bin:$PATH"
+eval "$(pyenv init -)"
