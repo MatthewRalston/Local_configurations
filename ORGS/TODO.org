@@ -1,69 +1,113 @@
 T H I S    I S    A    T O - D O    L I S T
 
 
-* TODO General To-do
 
-** Meeting with Terry
-*** BAM files
-**** Plasmid
-**** CAP0151-176
-**** Longest
-**** Reversal
-**** Spo0A
-*** interactive R session
-**** Load files
-**** full chrom, full plas
-** Transcript expression distribution
+* Figures
+** TODO Read breakdown before and after curation of psol (curation.r)
+*** Recalculate read counts with maximum number of reads...
+** Comparative genomics of C. beij (+ others)
+** 
 
-** Assembly
-*** Remove misassembled transcripts
-**** Expression thresholds for each sample
-**** Minimum expressino thresholds
-*** Split fused transcripts
-**** Option 1: heuristic
-**** Option 2: Separating with coverage rule
-***** fit negative binomial model of count coverage for each transcript (not including first/last 10 bp?)
-***** OR K.S.?
-***** Mann-Whitney/Wilcoxon
-***** Goodness of fit test
-*** Address spurious antisense detection
-**** Spearman Correlation
-**** Anticorrelation over time
-**** Expression thresholds
-** Annotation
-*** 4503 ORFs without merging extended ORFs -> 3347 ORFs with merge = 1156 Extended ORFs, 60 new orfs
-*** Add 90 new ORFs
-*** Reannotate long standard
+* Why so low in Refcds??
+** Reads with failed quality
+** Unassembled data
+** Assembled data with partial or multiple alignments to genome
+** Background signal
+
+* TODO Graphs and Statistics for assembly/annotation
+** Reads (total and per sample)
+*** 570,460,211 rRNA free reads
+*** mapped reads
+**** total mapped 562,382,753
+**** both mapped 548,387,224
+**** singleton read (unpaired): 8,960,839 + 5,034,690 = 13,995,529
+**** properly paired 458,814,860 
+
+** Distributions
+*** Feature size
+**** Transcript length (novel vs reference containing vs total)
+**** CDS length (novel vs reference)
+**** Operon length (assembly vs paredes)
+*** Operon size
+**** Paredes vs assembly
+*** UTR length
+**** 5' 3' UTRs
+**** Intra-operonic UTRs (assembly vs paredes)
+*** IGR
+**** Reference vs paredes vs reannotation vs assembly
+*** Coverage
+**** Percentiles of transcript
+**** Across first/last 100bp of transcript
+**** Carlos vs assembly
+** Percentages
+*** Assembled basepairs/Megabases 
+**** Novel 
+**** Standard 
+**** CDS 
+**** Total
+**** awk '{sum += $4/5} END {print sum}'
+*** Number of transcripts
+**** Novel
+**** Standard
+**** CDS
+**** Total
+*** Expressed basepairs
+**** Per sample (vs entire genome)
 
 
-** Assembly / Annotation workflow
-*** Assembly with trinity and postprocessing (trinity.sh, sortblast, unix commands)
-**** Realignment of transcripts to genome with
-***** blat
-***** bwa
-***** blast
-**** sortblast to separate transcripts with
-***** single optimal unique alignment
-***** optimal alignment with partial sub-alignments
-***** multiple equal alignments
-**** Quick postprocessing 'unique' only
-*** Annotation of assembly with trinotate.sh
-**** Transdecoder
-***** grep -v 'complete' results.transdecoder.cds | grep '>' | ruby -ne 'line=$_.chomp; line=line.split[0][1..-1] > results.incomplete.cds
-***** sed -i 's/|/~/' results.transdecoder.cds
-***** mv results.transdecoder.gff3 results.transdecoder.all.gff3
-***** grep -v 'partial' results.transdecoder.gff3 | grep -v 'internal' > results.transdecoder.gff3
-***** ruby scripting to import 'incomplete' cdses from above, remove from fasta records (mapping the keys back ~ -> | )
-***** and also from cds records of the gff3
-**** assmeblyconvert.rb
-***** changes the transcript and cds fastas, the transcript and cds gtfs into genomic coordinates,
-***** parses to genbank
-*** RAST
-**** 185301 (genome reannotation)
-**** 191494 (transdecoder only)
-**** 191496 (standard only)
-**** 191495 (merged)
-** Annotation Notes
+* Shawn
+** Sig F, E, G
+** Shawn's thesis on shared drive
+* Assembly
+** METHODS
+*** Realignment with blast/blat/bwa
+*** Sortblast.rb
+**** Separates transcripts with unique, partial, or multiple alignments
+*** Only use 'unique' transcripts
+*** Then use assemblycompare.rb
+** TODO Remove misassembled transcripts
+*** Expression thresholds
+**** >= 10 reads per sample
+**** >= 500 reads total
+** TODO Split fused transcripts
+*** Flow over transcript (start+20 -> end-20)
+*** run KS test for each base
+** TODO Address spurious antisense detection
+*** Spearman Correlation
+*** Anticorrelation over time
+*** Expression thresholds
+** TODO Multiple transcription start site detection
+*** acquire the utr/5' region of transcript
+*** cluster the bases by coverage
+*** Statistically assess 5' most base / TSS
+*** If gene is differentially expressed, test whether there is differential coverage
+* Annotation REMEMBER ALTERNATIVE!
+** Alternative for novel transcripts
+*** Use ORF finder that produces a gtf/bed
+*** Intersect these ORFs with the transcript set
+*** Then set difference the 'standard' cdses
+** METHOD
+*** Realign assembled transcripts to genome
+*** Utilize only 'unique' matches (<30bp in gaps, single optimal alignment)
+*** extract the genomic sequences of the aligned regions only
+*** Use the ORF finder Transdecoder to predict ORFs (both trained/untrained)
+*** Combine and process results, converting to genomic coordinates, formating
+*** Convert the annotation to genbank
+*** Submit to RAST for annotation and comparison
+** Transdecoder (NO TRAINING)
+*** 1. Bedtools to find novel CDS
+*** 2. Add novel CDS to standard cds
+*** 3. Format crap for assemblyconvert
+**** grep -v 'complete' results.transdecoder.cds | grep '>' | ruby -ne 'line=$_.chomp; line=line.split[0][1..-1] > results.incomplete.cds
+**** sed -i 's/|/~/' results.transdecoder.cds
+**** mv results.transdecoder.gff3 results.transdecoder.all.gff3
+**** grep -v 'partial' results.transdecoder.gff3 | grep -v 'internal' > results.transdecoder.gff3
+**** ruby scripting to import 'incomplete' cdses from above, remove from fasta records (mapping the keys back ~ -> | )
+**** and also from cds records of the gff3
+*** 4. assmeblyconvert.rb
+**** changes the transcript and cds fastas, the transcript and cds gtfs into genomic coordinates,
+**** parses to genbank
+** Notes
 *** 185301 | 32 (genome reannotation)
 **** vs. regular annotation (+ 105)
 ***** Signaling
@@ -79,7 +123,6 @@ T H I S    I S    A    T O - D O    L I S T
 ****** 2 extra genes in TCA (3-OA synthase [FabH,FabF])
 ****** 1 extra gene in lysine biosynthesis (N-Ac-diaminopimelate deacetylase)
 ****** 1 extra gene in nicotinate biosynthesis (Alkaline phosphodiesterase)
-
 
 *** 191494 | 33 (transdecoder only)
 **** vs reannotation (+2, 1359 in common, -709)
@@ -115,218 +158,123 @@ T H I S    I S    A    T O - D O    L I S T
 *** 192316 | 36 (untrained)
 *** 
 
-** TODO Analyses
-
-*** Generic summary stats
-**** Percentage of expressed bases 60-75%
-**** 7.5Mb assembled
-*** TODO Transcriptome Assembly
-**** Realign transcripts to genome
-***** 3054 have one best alignment to the genome (have more no more than 30bp difference in length of alignment to length of the transcript)
-***** Alternatively, 47 have one best alignment to the genome, but other smaller alignments representing a misassembly/gap and/or issues with realignment parameters
-***** Otherwise, there are 29 transcripts that have multiple equal best alignments throughout the genome
-**** How to fix issues?
-***** See if behavior is consistent for paired only
-***** Fix 29 by manual inspection (multiple) will be problematic
-***** Fix 47 by manual inspection
-
-**** Assemble without unpaired data
-*** TODO Transcriptome Annotation
-**** Strateg:
-***** Realign total and paired-only transcripts to genome with BLAST
-***** Parse BLAST output into unique, partial, and multiple alignments
-***** TODO Manually curate where necessary
-***** TODO Combine all into one gtf
-***** TODO Process gtf to obtain fasta sequences of transcripts
-***** TODO Run transdecoder on fasta sequences
-***** TODO Convert the transdecoder coordinates into genomic coordinates
-***** TODO Combine transdecoder peptide sequences, coordinates, and transcript coordinates into one genbank file
-**** Annotation comparison
-**** Metabololic model comparison
-*** TODO COMPARISONS
-**** Pairwise comparisons (IN RAST??)
-***** Reference to re-annotation
-***** Re-annotation to transcriptome
-***** Transcriptome to reference
-**** STATS
-***** Distributions
-****** Feature size
-******* Elements
-******** Transcript length (novel vs reference containing vs total)
-******** CDS length (ref vs re-annotation vs assembly)
-******** Operon length (assembly vs paredes)
-******* Comparisons
-******** Reference
-******** Reannotation
-******** Assembly
-****** Operon size
-******* Paredes vs assembly
-****** UTR length
-******* 5' 3' UTRs
-******* Intra-operonic UTRs (assembly vs paredes)
-****** IGR
-******* Reference vs paredes vs reannotation vs assembly
-****** CDS location along percentage of the transcript
-******* Carlos vs assembly
-***** Percentages
-****** CDS basepairs / assembled basepairs
-****** CDS-containing transcript basepairs / assembled basepairs
-****** Percentage/number of overlap
-**** RAST comparisons
-***** Comparing annotations
-***** Comparing functions
-***** Comparing metabolism
-**** Proteomic data
-***** Full set from Keerthi's excel file has 660 proteins
-*** TODO Antisense transcript filtering
-**** Expression criteria ( < 2 stdevs from mean expression level, 95% CI)
-**** Differentially expressed transcript and partner
-**** Over RBS
-**** Anticorrelated with partner?
-*** TODO Comparing TSSes
-**** Significance criteria
-***** Gene is differentially expressed
-***** Statistical??
-***** Coverage/expression thresholds
-**** Summary stats about how many TSSes were changed by stress
-**** Compare GTFs to assess changes in a single gene's TSS
-**** Note that the gene names will not be the same
-*** TODO REDO the assembly/annotation graphs with new annotaiton
-**** Distribution of CDSes along the percentage of the transcript
-**** Transcript length
-***** CDS size
-***** Old operon structure
-***** Include Paired only assembly
-**** UTR length
-***** Update with new annotation AND reference only
-***** Intra-ORF UTRs (UTRs inside of operons)
-***** Old Intra-ORF UTRs (paredes)
-**** Operon size
-***** Show BOTH reference and transcriptome assembly
-***** operon sizes
-*** LATER
-**** TODO Gene expression clustering
-***** Optimal clustering based on
-****** Boxplots of clustering metrics
-****** MANOVA results
-****** Sorting by parameter sets
-****** USE A FEW
-***** Plot the behavior
-***** Supplementary
-****** Preprocessing
-******* Data normalization [[http://manuals.bioinformatics.ucr.edu/home/R_BioCondManual#TOC-Clustering-and-Data-Mining-in-R][Scaling]] (DE normalization??)
-******* Regularization? (a la DEseq?
-****** Feature selection
-******* Differential genes only
-****** Distance metric
-******* Distance matrix selection (e.g. Minkowski measures: Euclidean, Manhattan, Chebyshev OR Mahalanobis**)
-******** Useful when searching for EXACT matches between profiles
-******* Correlation matrix ***
-******* Conditional entropy
-****** Linkage
-******* Single (nearest)
-******* Complete (farthest)
-******* Average
-******* Centroid (distance between centroid of each cluster)
-******* Ward (minimizes ANOVA SSE between the clusters)
-****** THEN: CLUSTER [[http://cran.at.r-project.org/web/views/Cluster.html][R portal to clustering]]
-****** Considerations
-******* Partical or complete clustering? (Do all genes need a cluster?)
-****** Techniques
-******* Hierarchical clustering (agglomerative)
-******** Assumptions:
-********* None, well that the criterion for calculating (a)similarity is appropriate
-******** Options:
-********* Connectivity constraints
-******** Pros:
-********* Easy to implement
-********* Informative
-******** Cons:
-********* Debate over utility: pergormance is close to random
-******* K-means (Partitive; iterative)
-******** Assumptions:
-********* Clusters are convex
-******** K-medians
-******** K-medoids (PAM)
-******** Spectral clustering
-******** Tight clustering (random resampling)
-********* Noise tolerant
-******** MGKM (higher cost, slight improvement)
-******** IGKA (incremental genetic K-means algo.; combines genetic algorithm and K-means)
-********* Uses 'Total within cluster variance' as fitness function
-********* Incrementally clusters centroids
-********* Sensitive to by GA parameters (mutation rate, generation, etc.)
-******* Density based clustering
-******** Pros/cons
-********* Pros
-********** No assumptions on convexity
-********* Cons
-********** Non-deterministic
-******** EnDBSCAN/OPTICS
-******** Mean-shift (uses KDE)
-******* Self organizing maps (Neural nets)
-******** SOTA
-******** DGSOT
-******** GHTSOM
-********* Very unique training criteria
-********* New nodes are trained only using input which caused the parent node to fire
-********* Inputs mapping to leaf neurons at the top of the hierarchy are usually noise!!
-******* Biclustering
-******** FLOC (George Church??)
-******** Possibilistic biclustering
-********* H score
-******* Fuzzy clustering
-******** Fuzzy C-means/ FLAME
-********* Differ by weighting; A gene's FCM membership score is proportional to similarity to cluster mean)
-********* FLAME determined by weighted similary to K-nearest neighbors and their membership score to cluster
-
-******* Search based
-******** Simulated annealing
-******** FLOC
-******** Expectation maximization
-******* Graph theoretic
-******** CAST
-****** Evaluation
-******* fpc
-******** Methods:
-********* dbscan
-********* mergenormals (gaussian mixture, use with centered, regularized)
-********* kmeansruns
-********* pamk
-******** Resampling:
-********* Clusterboot
-******** prediction.strength (compute optimal number of clusters)
-******** (plotcluster) graphing of a clustering
-******* clValid (GO and other metrics@!!)
-******* clv
-******* clusplot (cluster package)
-******* pvclust (hierarchical restrapping -> p-values; remember to transpose)
-**** TODO Gene Ontology
-***** Methods
-****** First, map CAC to GeneIDs through 'extract.rb'
-****** THEN DAVID!!
-****** If not:
-******* map GeneID -> Uniprot KB ID (select all, download 'target list')
-*******  -> DAVID
-***** Overall
-****** General enrichment for differential expression
-***** Subsets
-****** Factors:
-******* By time point
-******* By stress
-******* By up/down-regulation
-****** Clusters
-***** Visualizations
-****** Circos map
-******* Add up the silhouettes/davies/dunn
-******* Divide total chromosome size by sum, call 'size'
-******* Each 'unit' of the metric is worth 1 'size'
-******* For each cluster, start end, based on value collate:
+* LATER
+** Expression Analyses
+*** D.E
+*** Ontology/enrichment
+**** Methods
+***** First, map CAC to GeneIDs through 'extract.rb'
+***** THEN DAVID!!
+***** If not:
+****** map GeneID -> Uniprot KB ID (select all, download 'target list')
+******  -> DAVID
+**** Subsets
+***** Factors:
+****** By time point
+****** By stress
+****** By up/down-regulation
+**** Visualizations
+***** Circos map
+****** Add up the silhouettes/davies/dunn
+****** Divide total chromosome size by sum, call 'size'
+****** Each 'unit' of the metric is worth 1 'size'
+****** For each cluster, start end, based on value collate:
 chr,start,end,metric,svgcluster=x,svggo=blahblahblah
-****** D3 Interaction matrix
-******* Sort by clustering
-**** TODO Redo the expression analyses, correlation, PCA
-***** Retool the PCA to analyze the NORMALIZED data, the regularized data is biased
+***** D3 Interaction matrix
+****** Sort by clustering
+*** Expression clustering
+**** Supplementary
+***** Preprocessing
+****** Data normalization [[http://manuals.bioinformatics.ucr.edu/home/R_BioCondManual#TOC-Clustering-and-Data-Mining-in-R][Scaling]] (DE normalization??)
+****** Regularization? (a la DEseq?
+***** Feature selection
+****** Differential genes only
+***** Distance metric
+****** Distance matrix selection (e.g. Minkowski measures: Euclidean, Manhattan, Chebyshev OR Mahalanobis**)
+******* Useful when searching for EXACT matches between profiles
+****** Correlation matrix ***
+****** Conditional entropy
+***** Linkage
+****** Single (nearest)
+****** Complete (farthest)
+****** Average
+****** Centroid (distance between centroid of each cluster)
+****** Ward (minimizes ANOVA SSE between the clusters)
+***** THEN: CLUSTER [[http://cran.at.r-project.org/web/views/Cluster.html][R portal to clustering]]
+***** Considerations
+****** Partical or complete clustering? (Do all genes need a cluster?)
+***** Techniques
+****** Hierarchical clustering (agglomerative)
+******* Assumptions:
+******** None, well that the criterion for calculating (a)similarity is appropriate
+******* Options:
+******** Connectivity constraints
+******* Pros:
+******** Easy to implement
+******** Informative
+******* Cons:
+******** Debate over utility: pergormance is close to random
+****** K-means (Partitive; iterative)
+******* Assumptions:
+******** Clusters are convex
+******* K-medians
+******* K-medoids (PAM)
+******* Spectral clustering
+******* Tight clustering (random resampling)
+******** Noise tolerant
+******* MGKM (higher cost, slight improvement)
+******* IGKA (incremental genetic K-means algo.; combines genetic algorithm and K-means)
+******** Uses 'Total within cluster variance' as fitness function
+******** Incrementally clusters centroids
+******** Sensitive to by GA parameters (mutation rate, generation, etc.)
+****** Density based clustering
+******* Pros/cons
+******** Pros
+********* No assumptions on convexity
+******** Cons
+********* Non-deterministic
+******* EnDBSCAN/OPTICS
+******* Mean-shift (uses KDE)
+****** Self organizing maps (Neural nets)
+******* SOTA
+******* DGSOT
+******* GHTSOM
+******** Very unique training criteria
+******** New nodes are trained only using input which caused the parent node to fire
+******** Inputs mapping to leaf neurons at the top of the hierarchy are usually noise!!
+****** Biclustering
+******* FLOC (George Church??)
+******* Possibilistic biclustering
+******** H score
+****** Fuzzy clustering
+******* Fuzzy C-means/ FLAME
+******** Differ by weighting; A gene's FCM membership score is proportional to similarity to cluster mean)
+******** FLAME determined by weighted similary to K-nearest neighbors and their membership score to cluster
+
+****** Search based
+******* Simulated annealing
+******* FLOC
+******* Expectation maximization
+****** Graph theoretic
+******* CAST
+***** Evaluation
+****** fpc
+******* Methods:
+******** dbscan
+******** mergenormals (gaussian mixture, use with centered, regularized)
+******** kmeansruns
+******** pamk
+******* Resampling:
+******** Clusterboot
+******* prediction.strength (compute optimal number of clusters)
+******* (plotcluster) graphing of a clustering
+****** clValid (GO and other metrics@!!)
+****** clv
+****** clusplot (cluster package)
+****** pvclust (hierarchical restrapping -> p-values; remember to transpose)
+** Promoter motifs
+** sRNA targeting
+* Visualizations
 ** TODO Main graph
 *** Add cluster visualization
 *** Show tooltip
@@ -341,6 +289,11 @@ chr,start,end,metric,svgcluster=x,svggo=blahblahblah
 ****** Plot [[http://bl.ocks.org/ndarville/6552457][confidence intervals]]
 ***** On mouseout
 ***** remove svg? or hide element
+** Glyph graph for Terry
+*** Kegg browser with glyph plot for stress, strand, time
+*** Show transcripts (orfs inside)
+*** Show glyphs/circles above/below each transcript (according to strand)
+*** glyph fill intensity/saturation and area are proportional to expression
 
 ** Other d3 graphs:
 *** Scatterplots
@@ -411,146 +364,6 @@ chr,start,end,metric,svgcluster=x,svggo=blahblahblah
 
 
 
-** cis-software
-*** Read Cufflinks GTF file in, create reverse-GTF
-*** Set difference of BAM - reverse GTF (filters entries not on opposite strand)
-*** Save as is?
-*** Pipe to set difference of filtered BAM - CDS? Forward Cufflinks GTF?
-*** Pipe to Cufflinks assembly
-*** !!!! IDEA !!!!
-**** Create a distribution of coverage (likely lognormal) for sense transcription
-**** Defined as transcripts with lengths greater than X and with genes mapping back on to them
-**** Then use a statistical hypothesis test to filter reads/transcripts with short length and low coverage.
-**** i.e. filter the transcript if the majority of its coverage is less than the threshold for sense transcription.
-**** (p < 0.05)
-
-** Metrics
-*** Number of TSS/CisRNA
-*** Distributions of reads/cisRNA
-*** Distribution of reads along TSS (same as first item of todo list)
-*** Size distribution of cisRNA / UTR region
-*** Number of cisRNA that overlap RBS, start codon
-*** Comparison of operon organization of Paredes.
-
-** TODO Reach out to Pam, Blake, Cathy, Shawn
-*** Hello _____
-*** I am wrapping up the first stage of my thesis research under Dr. Papoutsakis and I am looking
-*** to form my thesis committee. Given your background in (RNA, small RNA and NGS, NGS and bioinformatics)
-*** I believe that you might be interested in my project. I would love to tell you briefly about my research.
-*** Thank you for your time.
-
-
-** NOTE: For TSS annotation, use both non-unique and unique reads to detect TSS
-** Cuffdiff contains differential promoter usage information
-** TODO Galaxy
-*** TODO Go through a worked example
-*** TODO Upload data through ftp/filezilla
-*** TODO Document the steps required
-*** Talk with Shawn about setting up a local Galaxy install
-**** Step 1: Install- Karol
-**** Step 2: Linking tools: Matt and Karol
-**** Step 3: Configuring user accounts/account requests- Karol
-**** Step 4: Configuring data libraries/datasets: Shawn/Karol/Matt
-**** Step 5: Testing that users can run jobs locally on server node
-**** Step 6: Configuring Galaxy with Torque (Watch out for [[http://goo.gl/acKZ4x][Torque]]!) Resource management DRMAA
-**** Step 7: [[https://wiki.galaxyproject.org/Admin/Config/Performance/Cluster#Submitting_Jobs_as_the_Real_User][Submitting links as the real user]]
-**** 
-
-
-
-
-
-
-
-
-* Computational
-** Data exploration
-*** Library complexity
-**** Fraction of unique single reads of all mapped reads
-**** Fraction of unique pairs of all mapped pairs
-*** Coverage plot
-**** Coverage vs gene (%, 5'->3') (Express coverage over each gene, where gene length is expressed as percent)
-*** 
-*** 
-*** Correlations between replicates (FPKM)
-**** Pearson
-**** Spearman
-*** Coorelation plot
-**** Expression condition A vs expression condition B
-**** E.G. x vs. y, y vs. z, x vs. z
-**** Log transformed (shows more variation)
-**** What are the genes that deviate? How do we find them?
-***** Perform regression, calculate the residuals for each gene, sort the list by residuals
-*** Strandedness plots
-*** [[http://smithlab.usc.edu/plone/software/librarycomplexity][PRESEQ!!!]]
-**** Preseq is a library that randomly samples reads from a sequence alignment and uses this to calculate the
-**** redundancy of smaller libraries.
-
-** Further exploration
-*** ADDRESS OVERPLOTTING BY [[http://gettinggeneticsdone.blogspot.com/2012/07/fix-overplotting-with-colored-contour.html][Colour contour plot (CLICK ME!)]]
-*** Circos
-**** Histogram
-**** Scatterplot
-**** Line graph
-**** Heatmap
-**** Average read count
-**** Stack circos png into 3D
-***** Sliceomatic (Matlab)
-**** Create gif from circos pngs
-***** Hist/Line/Scatter
-***** Heatmap
-*** Volcano plots (MA plot: log2 fold change vs log normalized counts) w/ highlighting significant genes
-*** Significance plot (-log10(p-value/FDR) vs log2(fold change)
-*** Variation plot: variance (transformed?) vs log normalize counts
-** Differential expression
-*** Cuffdiff/cuffnorm
-*** DEseq
-*** MLseq
-** Visualize in circos
-
-* NGS tutorial workshop
-** PhiX reads
-** Ask students to create a galaxy account and load the phiX genome into their data
-
-* Social
-** Events
-** Personal
-*** Valentine's Day
-**** Set experiments
-**** Get gift
-**** Practice ingredients
-*** Allison's 40th
-**** Find out reservation policy
-**** Find out about classes?
-
-
-* THESIS
-** Transcription start site
-** New sRNAs
-** Clustering by expression pattern(old data)
-** Use clusters and TSS info to predict promoter motifs
-*** Check if motifs are similar to known.
-*** Split clusters into training and test data
-*** Use the training data to build a motif
-*** Test the motif against the test dataset
-*** If the motifs match well, arrive at consensus sequence
-
-** Validate by multiplex 5' RACE?
-
-* Process old data
-** Do process for one dataset
-*** Quality contorl script BASH
-*** Trimming/clipping/filtering/qc script BASH + RUBY
-**** Create parsing script to flags files/datasets with poor statistics? From which output?
-**** Use flag as input for next round of Trimming/clipping/filtering/qc
-*** Mapping BASH
-*** Post-mapping quality
-** Repeat using recursion for files in a directory
-*** Retool scripts for handling these data
-
-* COURSERA
-** TODO Read the 'How to Design Programs' Felleisen et al.
-
 * Schools/Areas
 Massachussetts
 Pennsylvania
@@ -568,7 +381,6 @@ Connecticut
 Ohio
 Illinois
 
-
 * Textbooks
 ** TODO Biological Modeling and Simulation
 ** TODO General Statistics
@@ -579,8 +391,6 @@ Illinois
 ** TODO Statistics D.O.E.
 ** TODO Partial Diff Eq.
 ** TODO Mathematical Biology
-* Professional Development
-** TODO Claude Shannon - Mathematical Theory of Communication
 * Fields to Study
 ** TODO Thermodynamics
 ** TODO Mathematics
