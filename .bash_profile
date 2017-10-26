@@ -12,7 +12,7 @@ export PERL5LIB="$HOME/SourceCache/bioperl-live:$PERL5LIB"
 # Choose Default editor
 export VISUAL=emacs
 export EDITOR="$VISUAL"
-source ~/.functions
+source ~/.functions.sh
 #source ~/.profile
 #source ~/.bashrc
 
@@ -80,22 +80,22 @@ export UC=$COLOR_YELLOW               # user's color
 [ $UID -eq "0" ] && export UC=$COLOR_RED   # root's color
 
 
-export PS1="$(gitmode --start)"
-#export PS1="\[${UC}\]\u@\h: \[${COLOR_GREEN}\]\$(vcprompt)| \[${COLOR_LIGHT_CYAN}\]\w >"
-
-#PS1="$TITLEBAR\n\[${UC}\]\u \[${COLOR_LIGHT_BLUE}\]\${PWD} \[${COLOR_BLACK}\]\$(vcprompt) \n\[${COLOR_LIGHT_GREEN}\]→\[${COLOR_NC}\] "
-
 # A W S
-export EC2_HOME=/usr/local/ec2/ec2-api-tools-1.7.5.1
+#export EC2_HOME=/usr/local/ec2/ec2-api-tools-1.7.5.1
 export EC2_URL=https://ec2.us-east-1.amazonaws.com
 
 # P A T H
 export PYENV_ROOT=$HOME/.pyenv
-export JAVA_HOME=/home/ralstonm/Projects/external_packages/jre1.7.0_67/
 PATH=$PATH:/usr/lib64/qt-3.3/bin:/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/domino:/root/bin
-PATH=$PATH:/home/ralstonm/.rvm/rubies/ruby-2.2.1/bin:/home/ralstonm/home/bin:$PYENV_ROOT/bin:$HOME/Projects/external_packages/bin:/apps/sys/python/2.7.8/bin:/apps/sys/R/R/bin/:/apps/sys/bin:/usr/local/bin:$HOME/pckges/circos-0.67-7/bin:/pckges/ansible/bin:/bin:/usr/bin:$PATH
+PATH=$PATH:$HOME/.rvm/rubies/ruby-2.2.1/bin:$HOME/home/bin:$PYENV_ROOT/bin:$HOME/Projects/external_packages/bin:/usr/local/bin:$HOME/pckges/circos-0.67-7/bin:/pckges/ansible/bin:/bin:/usr/bin:$PATH
 PATH=$PATH:$EC2_HOME/bin
 export PATH
+
+# Terminal prompt
+export PS1="$(gitmode --start)"
+#export PS1="\[${UC}\]\u@\h: \[${COLOR_GREEN}\]\$(vcprompt)| \[${COLOR_LIGHT_CYAN}\]\w >"
+
+#PS1="$TITLEBAR\n\[${UC}\]\u \[${COLOR_LIGHT_BLUE}\]\${PWD} \[${COLOR_BLACK}\]\$(vcprompt) \n\[${COLOR_LIGHT_GREEN}\]→\[${COLOR_NC}\] "
 
 # P Y T H O N
 eval "$(pyenv init -)"
@@ -108,7 +108,7 @@ export RUBY=$RUBY221/bin
 #export RUBY_GEMS=$RVM/gems/ruby-2.2.1/bin
 export GEM_HOME=$RUBY221/lib/ruby/gems/2.2.0
 export PATH=$RUBY:$PATH
-export RSENSE_HOME=/home/matt/home/pckges/rsense-0.3
+export RSENSE_HOME=$HOME/pckges/rsense-0.3
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
 # A n s i b l e
@@ -130,8 +130,8 @@ complete -C aws_completer aws
 
 
 
-if [ $(hostname) == "Argo-evolution" ]
+if [ $(hostname) == "argo" ]
 then
-   screenfetch
-   xmodmap ~/.xmodmap
+   neofetch
+   #xmodmap ~/.xmodmap
 fi
