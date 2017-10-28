@@ -16,6 +16,10 @@ source ~/.functions.sh
 #source ~/.profile
 #source ~/.bashrc
 
+# Other bash environment variables
+export TMPDIR=/storage/data/scratch
+#export TMP=$TMPDIR
+#export TEMP
 
 
 # don't put duplicate lines in the history. See bash(1) for more options
@@ -36,6 +40,11 @@ lsd () {
 lsf () {
     ls -alF "$@" | grep -v /$
 }
+
+function chkplz () {
+    find $1 -type f -exec md5sum {} + | grep "^$2"
+}
+
 alias ll='ls -h ${LS_OPTS}'
 #Shows hidden files such as bashrc
 alias la='ls -A'
@@ -54,7 +63,7 @@ alias REMAP="xmodmap ~/.xmodmap"
 export GREP_OPTIONS='--color=auto'
 
 # COLORS!!
-export TERM=xterm-color
+export TERM=xterm-256color
 export GREP_COLOR='1;32'
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
@@ -85,11 +94,30 @@ export UC=$COLOR_YELLOW               # user's color
 export EC2_URL=https://ec2.us-east-1.amazonaws.com
 
 # P A T H
+PATH=/bin:/usr/bin:/usr/local/bin:$HOME/bin:/opt/texlive/2021/bin/x86_64-linux
 export PYENV_ROOT=$HOME/.pyenv
-PATH=$PATH:/usr/lib64/qt-3.3/bin:/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/domino:/root/bin
-PATH=$PATH:$HOME/.rvm/rubies/ruby-2.2.1/bin:$HOME/home/bin:$PYENV_ROOT/bin:$HOME/Projects/external_packages/bin:/usr/local/bin:$HOME/pckges/circos-0.67-7/bin:/pckges/ansible/bin:/bin:/usr/bin:$PATH
-PATH=$PATH:$EC2_HOME/bin
+PATH=$PATH:$PYENV_ROOT/bin
+# NCBI/Entrez utilities
+# Download SRA-tools binaries
+# Download Entrez Direct https://www.ncbi.nlm.nih.gov/books/NBK179288/
+PATH=$PATH:$HOME/edirect
 export PATH
+
+# P Y T H O N
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+#pyenv activate v2.7.10
+
+# N O D E
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Powerline
+powerline-daemon -q
+POWERLINE_BASH_CONTINUATION=1
+POWERLINE_BASH_SELECT=1
+#. /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh
 
 # Terminal prompt
 export PS1="$(gitmode --start)"
@@ -97,9 +125,6 @@ export PS1="$(gitmode --start)"
 
 #PS1="$TITLEBAR\n\[${UC}\]\u \[${COLOR_LIGHT_BLUE}\]\${PWD} \[${COLOR_BLACK}\]\$(vcprompt) \n\[${COLOR_LIGHT_GREEN}\]→\[${COLOR_NC}\] "
 
-# P Y T H O N
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
 
 # R U B Y
 export RVM=$HOME/.rvm
@@ -135,3 +160,4 @@ then
    neofetch
    #xmodmap ~/.xmodmap
 fi
+export GPG_TTY=$(tty)
