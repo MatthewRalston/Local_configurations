@@ -45,6 +45,10 @@ function chkplz () {
     find $1 -type f -exec md5sum {} + | grep "^$2"
 }
 
+function knit() {
+    R -e "rmarkdown::render('$1', pdf_document(), params=list())"
+} # M-x polymode-set-exporter while in poly-markdown+r-mode
+
 alias ll='ls -h ${LS_OPTS}'
 #Shows hidden files such as bashrc
 alias la='ls -A'
