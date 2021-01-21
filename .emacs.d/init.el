@@ -21,7 +21,11 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(leuven))
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
+ '(custom-enabled-themes '(deeper-blue))
  '(markdown-command-needs-filename t)
  '(package-selected-packages
    '(jupyter ess ess-smart-equals markdown-mode dockerfile-mode haskell-mode cython-mode auto-complete-rst sphinx-doc sphinx-frontend sphinx-mode jedi jedi-core jedi-direx flycheck flycheck-perl6 flycheck-pycheckers flycheck-stack flycheck-yamllint flymake-haskell-multi flymake-python-pyflakes flymake-ruby mmm-mode json-mode json-reformat coffee-mode yaml-mode web-mode tramp-term ssh smartparens rvm ruby-tools ruby-guard ruby-block rsense polymode paredit-everywhere nodejs-repl multi-web-mode markdown-toc markdown-mode+ magit-tramp highlight-parentheses highlight-indentation git-rebase-mode git-commit-mode gh-md ess-R-object-popup ess-R-data-view ensime enh-ruby-mode docker cmake-mode auto-complete-pcmp auctex ac-slime ac-js2 ac-inf-ruby ac-html-csswatcher ac-html-bootstrap ac-html-angular ac-html))

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Exec=xfce4-terminal --drop-down
+X-GNOME-Autostart-enabled=true
+NoDisplay=false
+Hidden=false
+Name[C]=Terminal
+Comment[C]=No description
+X-GNOME-Autostart-Delay=0

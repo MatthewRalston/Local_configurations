@@ -30,7 +30,7 @@
 ;; Global history list allows Emacs to "remember" the last
 ;; render commands and propose as suggestions in the minibuffer.
 (defvar rmd-render-history nil "History list for spa/rmd-render.")
-(defun spa/rmd-render (arg)
+(defun rmd-render (arg)
   "Render the current Rmd file to PDF output.
    With a prefix arg, edit the R command in the minibuffer"
   (interactive "P")

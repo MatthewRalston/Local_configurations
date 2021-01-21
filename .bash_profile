@@ -152,10 +152,10 @@ export MANPATH=$MANPATH:/pckges/ansible/docs/man
 export PGDATA=/usr/local/pgsql/data
 
 
-
+## Completions
 # Amazon Web Services
 complete -C aws_completer aws
-
+source /usr/share/bash-completions/completions/systemctl
 
 
 
